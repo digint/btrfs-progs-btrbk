@@ -1704,6 +1704,7 @@ static const char * const cmd_qgroup_destroy_usage[] = {
 	NULL
 };
 
+// @SEPARATED btrfs-qgroup-destroy fscaps: cap_sys_admin,cap_dac_override
 static int cmd_qgroup_destroy(const struct cmd_struct *cmd,
 			      int argc, char **argv)
 {

@@ -1476,6 +1476,7 @@ static struct btrfs_list_comparer_set *btrfs_list_alloc_comparer_set(void)
 	return set;
 }
 
+// @SEPARATED btrfs-subvolume-list fscaps: cap_sys_admin,cap_fowner,cap_dac_read_search
 static int cmd_subvol_list(const struct cmd_struct *cmd, int argc, char **argv)
 {
 	struct btrfs_list_filter_set *filter_set;
