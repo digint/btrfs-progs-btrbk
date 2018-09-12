@@ -1665,6 +1665,7 @@ static const char * const cmd_receive_usage[] = {
 	NULL
 };
 
+// @SEPARATED btrfs-receive fscaps: cap_sys_admin,cap_fowner,cap_chown,cap_mknod,cap_setfcap,cap_dac_override,cap_dac_read_search
 static int cmd_receive(const struct cmd_struct *cmd, int argc, char **argv)
 {
 	char *tomnt = NULL;
