@@ -597,6 +597,7 @@ static int cmd_device_usage(int argc, char **argv)
 static const char device_cmd_group_info[] =
 "manage and query devices in the filesystem";
 
+#ifndef BTRFS_SEPARATED_BUILD
 const struct cmd_group device_cmd_group = {
 	device_cmd_group_usage, device_cmd_group_info, {
 		{ "add", cmd_device_add, cmd_device_add_usage, NULL, 0 },
@@ -616,3 +617,4 @@ int cmd_device(int argc, char **argv)
 {
 	return handle_command_group(&device_cmd_group, argc, argv);
 }
+#endif

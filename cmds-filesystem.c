@@ -1185,6 +1185,7 @@ static int cmd_filesystem_label(int argc, char **argv)
 static const char filesystem_cmd_group_info[] =
 "overall filesystem tasks and information";
 
+#ifndef BTRFS_SEPARATED_BUILD
 const struct cmd_group filesystem_cmd_group = {
 	filesystem_cmd_group_usage, filesystem_cmd_group_info, {
 		{ "df", cmd_filesystem_df, cmd_filesystem_df_usage, NULL, 0 },
@@ -1212,3 +1213,4 @@ int cmd_filesystem(int argc, char **argv)
 {
 	return handle_command_group(&filesystem_cmd_group, argc, argv);
 }
+#endif

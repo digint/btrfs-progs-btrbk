@@ -546,6 +546,7 @@ static int cmd_replace_cancel(int argc, char **argv)
 static const char replace_cmd_group_info[] =
 "replace a device in the filesystem";
 
+#ifndef BTRFS_SEPARATED_BUILD
 const struct cmd_group replace_cmd_group = {
 	replace_cmd_group_usage, replace_cmd_group_info, {
 		{ "start", cmd_replace_start, cmd_replace_start_usage, NULL,
@@ -562,3 +563,4 @@ int cmd_replace(int argc, char **argv)
 {
 	return handle_command_group(&replace_cmd_group, argc, argv);
 }
+#endif

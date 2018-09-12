@@ -194,6 +194,7 @@ static int cmd_quota_rescan(int argc, char **argv)
 static const char quota_cmd_group_info[] =
 "manage filesystem quota settings";
 
+#ifndef BTRFS_SEPARATED_BUILD
 const struct cmd_group quota_cmd_group = {
 	quota_cmd_group_usage, quota_cmd_group_info, {
 		{ "enable", cmd_quota_enable, cmd_quota_enable_usage, NULL, 0 },
@@ -208,3 +209,4 @@ int cmd_quota(int argc, char **argv)
 {
 	return handle_command_group(&quota_cmd_group, argc, argv);
 }
+#endif

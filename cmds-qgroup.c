@@ -503,6 +503,7 @@ static int cmd_qgroup_limit(int argc, char **argv)
 static const char qgroup_cmd_group_info[] =
 "manage quota groups";
 
+#ifndef BTRFS_SEPARATED_BUILD
 const struct cmd_group qgroup_cmd_group = {
 	qgroup_cmd_group_usage, qgroup_cmd_group_info, {
 		{ "assign", cmd_qgroup_assign, cmd_qgroup_assign_usage,
@@ -525,3 +526,4 @@ int cmd_qgroup(int argc, char **argv)
 {
 	return handle_command_group(&qgroup_cmd_group, argc, argv);
 }
+#endif
