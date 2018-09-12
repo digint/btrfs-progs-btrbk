@@ -334,6 +334,25 @@ progs_install =
 progs_build =
 endif
 
+ifeq ($(BUILD_BTRFS_SEPARATED),1)
+# Note: intentionally not addded to progs_install:
+# use -enable-setcap-install, --enable-setuid-install instead.
+progs_build += $(progs_separated)
+endif
+
+INSTALL_SEPARATED_OPTIONS = -m755
+ifeq ($(ENABLE_INSTALL_SETCAP),1)
+INSTALL_SEPARATED_OPTIONS = -m710
+progs_install_separated += $(progs_separated_fscaps)
+endif
+ifeq ($(ENABLE_INSTALL_SETUID),1)
+INSTALL_SEPARATED_OPTIONS = -m4710
+progs_install_separated += $(progs_separated_fscaps)
+endif
+ifdef SETCAP_GROUP
+INSTALL_SEPARATED_OPTIONS += -g$(SETCAP_GROUP)
+endif
+
 # Parse "static int cmd_xxx_yyy(int argc, char **argv)" lines in cfiles, and
 # create whitespace separated map of form: "btrfs-xxx-yyy@key:value".
 sc_cfiles := $(wildcard cmds/*.c)
@@ -898,7 +917,7 @@ $(CLEANDIRS):
 	@echo "Cleaning $(patsubst clean-%,%,$@)"
 	$(Q)$(MAKE) $(MAKEOPTS) -C $(patsubst clean-%,%,$@) clean
 
-install: $(libs_build) $(progs_install) $(INSTALLDIRS)
+install: $(libs_build) $(progs_install) $(progs_install_separated) $(INSTALLDIRS)
 ifeq ($(BUILD_PROGRAMS),1)
 	$(INSTALL) -m755 -d $(DESTDIR)$(bindir)
 	$(INSTALL) $(progs_install) $(DESTDIR)$(bindir)
@@ -922,6 +941,9 @@ endif
 	$(INSTALL) -m755 -d $(DESTDIR)$(pkgconfigdir)
 	$(INSTALL) -m644 libbtrfsutil/libbtrfsutil.pc $(DESTDIR)$(pkgconfigdir)
 endif
+ifeq ($(BUILD_BTRFS_SEPARATED),1)
+	$(Q)$(MAKE) $(MAKEOPTS) install-separated
+endif
 
 ifeq ($(PYTHON_BINDINGS),1)
 install_python: libbtrfsutil_python
@@ -940,6 +962,18 @@ install-static: $(progs_static) $(INSTALLDIRS)
 	$(INSTALL) libbtrfs.a libbtrfsutil.a $(DESTDIR)$(libdir)
 	$(INSTALL) -m755 -d $(DESTDIR)$(incdir)/btrfs
 	$(INSTALL) -m644 $(libbtrfs_headers) $(DESTDIR)$(incdir)/btrfs
+
+# install separated btrfs binaries, set linux capabilities(7) defined
+# in "@SEPARATED" lines using setcap(8), remove ".separated" postfix
+install-btrfs-%.separated: btrfs-%.separated
+	$(INSTALL) -m755 -d $(DESTDIR)$(bindir)
+	$(INSTALL) $(INSTALL_SEPARATED_OPTIONS) $< $(DESTDIR)$(bindir)
+ifeq ($(ENABLE_INSTALL_SETCAP),1)
+	$(SETCAP) $(call sc_get,$(<:%.separated=%),fscaps)+ep $(DESTDIR)$(bindir)/$<
+endif
+	$(MV) $(DESTDIR)$(bindir)/$< $(DESTDIR)$(bindir)/$(<:%.separated=%)
+
+install-separated: $(progs_install_separated) $(patsubst %,install-%,$(progs_install_separated))
 
 $(INSTALLDIRS):
 	@echo "Making install in $(patsubst install-%,%,$@)"
