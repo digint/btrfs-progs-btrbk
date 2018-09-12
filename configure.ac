@@ -51,6 +51,8 @@ AC_PROG_LN_S
 AC_CHECK_TOOL([AR], [ar])
 AC_PATH_PROG([RM], [rm], [rm])
 AC_PATH_PROG([RMDIR], [rmdir], [rmdir])
+AC_PATH_PROG([MV], [mv], [mv])
+AC_PATH_PROG([SETCAP], [setcap], [setcap])
 
 
 AC_CHECK_FUNCS([openat], [],
@@ -317,6 +319,40 @@ AS_IF([test "x$enable_python" = xyes], [PYTHON_BINDINGS=1], [PYTHON_BINDINGS=0])
 AC_SUBST(PYTHON_BINDINGS)
 AC_SUBST(PYTHON)
 
+# check whether to build/install separated btrfs binaries
+AC_ARG_ENABLE([setcap-install],
+	AS_HELP_STRING([--enable-setcap-install], [install separated binaries with capabilities]),
+	[], [enable_setcap_install=no]
+)
+AS_IF([test "x$enable_setcap_install" = xyes], [ENABLE_INSTALL_SETCAP=1], [ENABLE_INSTALL_SETCAP=0])
+AC_SUBST([ENABLE_INSTALL_SETCAP])
+AM_CONDITIONAL(SETCAP_INSTALL, test x$enable_setcap_install = xyes)
+
+AC_ARG_ENABLE([setuid-install],
+	AS_HELP_STRING([--enable-setuid-install], [install separated binaries as setuid]),
+	[], [enable_setuid_install=no]
+)
+AS_IF([test "x$enable_setuid_install" = xyes], [ENABLE_INSTALL_SETUID=1], [ENABLE_INSTALL_SETUID=0])
+AC_SUBST([ENABLE_INSTALL_SETUID])
+
+if test "x$enable_setcap_install" = "xyes"; then
+	enable_btrfs_separated=yes
+	if test "x$enable_setuid_install" = "xyes"; then
+		AC_MSG_RESULT(setcap and setuid both selected)
+		AC_MSG_ERROR(You must choose either setcap-install or setuid-install)
+	fi
+fi
+if test "x$enable_setuid_install" = "xyes"; then
+	enable_btrfs_separated=yes
+fi
+
+AC_ARG_ENABLE([btrfs-separated],
+	AS_HELP_STRING([--enable-btrfs-separated], [build separated binaries for btrfs subcommands]),
+	[], [enable_btrfs_separated=no]
+)
+AS_IF([test "x$enable_btrfs_separated" = xyes], [BUILD_BTRFS_SEPARATED=1], [BUILD_BTRFS_SEPARATED=0])
+AC_SUBST([BUILD_BTRFS_SEPARATED])
+
 # udev v190 introduced the btrfs builtin and a udev rule to use it.
 # Our udev rule gives us the friendly dm names but isn't required (or valid)
 # on earlier releases.
@@ -394,6 +430,10 @@ AC_MSG_RESULT([
 	Python interpreter: ${PYTHON}
 	crypto provider:    ${cryptoprovider} ${cryptoproviderversion}
 	zoned device:       ${enable_zoned}
+
+	separated progs:    ${enable_btrfs_separated}
+	Install separated progs with capabilities: ${enable_setcap_install}
+	Install separated progs suid: ${enable_setuid_install}
 
 	Type 'make' to compile.
 ])
