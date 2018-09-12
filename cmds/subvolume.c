@@ -248,6 +248,7 @@ static const char * const cmd_subvolume_delete_usage[] = {
 	NULL
 };
 
+// @SEPARATED btrfs-subvolume-delete fscaps: cap_sys_admin,cap_dac_override
 static int cmd_subvolume_delete(const struct cmd_struct *cmd, int argc, char **argv)
 {
 	int res, ret = 0;
@@ -523,6 +524,7 @@ static const char * const cmd_subvolume_snapshot_usage[] = {
 	NULL
 };
 
+// @SEPARATED btrfs-subvolume-snapshot fscaps: cap_sys_admin,cap_fowner,cap_dac_override,cap_dac_read_search
 static int cmd_subvolume_snapshot(const struct cmd_struct *cmd, int argc, char **argv)
 {
 	char	*subvol, *dst;
@@ -1245,6 +1247,7 @@ static const char * const cmd_subvolume_show_usage[] = {
 	NULL
 };
 
+// @SEPARATED btrfs-subvolume-show fscaps: cap_sys_admin,cap_fowner,cap_dac_read_search
 static int cmd_subvolume_show(const struct cmd_struct *cmd, int argc, char **argv)
 {
 	char tstr[256];

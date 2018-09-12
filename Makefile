@@ -2,6 +2,7 @@
 # Basic build targets:
 #   all		all main tools and the shared library
 #   static      build static binaries, requires static version of the libraries
+#   separated   build separated binary for each "btrfs" subcommand
 #   test        run the full testsuite
 #   install     install binaries, shared libraries and header files to default
 #               location (/usr/local)
@@ -366,6 +367,27 @@ progs_install =
 progs_build =
 endif
 
+# Parse "static int cmd_xxx_yyy(int argc, char **argv)" lines in cfiles, and
+# create whitespace separated map of form: "btrfs-xxx-yyy@key:value".
+sc_cfiles := $(wildcard cmds/*.c)
+sc_map := $(foreach file,$(sc_cfiles),$(shell sed -rn 's!^(static )?DEFINE_SIMPLE_COMMAND\(([a-z_]+), \"([a-z_]+)\"\).*!btrfs_\2@cfile:$(file) btrfs_\2@cmdstruct:cmd_struct_\2 btrfs_\2@entry:cmd_\2 btrfs_\2@token:\3 btrfs_\2@static_cmdstruct:\1!p' $(file)))
+sc_map := $(foreach val,$(sc_map),$(subst _,-,$(firstword $(subst @, ,$(val))))@$(word 2,$(subst @, ,$(val))))
+sc_map := $(subst btrfs-subvol-,btrfs-subvolume-,$(sc_map))
+
+# Parse generic "@SEPARATED btrfs-xxx-yyy key: value" in cfiles, and add to map.
+sc_map += $(shell sed -rn 's/^.*@SEPARATED\s+(btrfs-[a-z-]+)\s+([a-z_]+):\s*(.*)$$/\1@\2:\3/p' $(sc_cfiles))
+sc_get = $(word 2,$(subst :, ,$(filter $(1)@$(2):%,$(sc_map))))
+
+# Exclude buggy commands
+sc_exclude = btrfs-property-get btrfs-property-set btrfs-property-list
+sc_cmds_all := $(sort $(foreach val,$(sc_map),$(firstword $(subst @, ,$(val)))))
+sc_cmds := $(filter-out $(sc_exclude),$(sc_cmds_all))
+sc_cmds_fscaps := $(sort $(subst @fscaps,,$(filter %@fscaps,$(subst :, ,$(sc_map)))))
+
+# Using suffix allows strict distinction in targets below (btrfs-%.separated[.o])
+progs_separated = $(addsuffix .separated,$(sc_cmds))
+progs_separated_fscaps = $(addsuffix .separated,$(sc_cmds_fscaps))
+
 # external libs required by various binaries; for btrfs-foo,
 # specify btrfs_foo_libs = <list of libs>; see $($(subst...)) rules below
 btrfs_convert_cflags = -DBTRFSCONVERT_EXT2=$(BTRFSCONVERT_EXT2)
@@ -455,6 +477,18 @@ endif
 	@echo "    [CC]     $@"
 	$(Q)$(CC) $(CFLAGS) -c $< -o $@ $($(subst /,_,$(subst -,_,$(@:%.o=%)-cflags))) \
 		$($(subst -,_,btrfs-$(@:%/$(notdir $@)=%)-cflags))
+
+# Compile target objects providing main() symbol (see commands.h:
+# BTRFS_SEPARATED_BUILD), using "cfile" from sc_map (cmd/xxx.c) as gcc infile.
+btrfs-%.separated.o: $(call sc_get,$(@:%.separated.o=%),cfile)
+	@echo "    [CC]     $@"
+	$(Q)$(CC) $(CFLAGS) \
+		-DBTRFS_SEPARATED_BUILD \
+		-DBTRFS_SEPARATED_ENTRY=$(call sc_get,$(@:%.separated.o=%),entry) \
+		-DBTRFS_SEPARATED_USAGE=$(call sc_get,$(@:%.separated.o=%),entry)_usage \
+		-DBTRFS_SEPARATED_CMD_STRUCT=$(call sc_get,$(@:%.separated.o=%),cmdstruct) \
+		$(if $(call sc_get,$(@:%.separated.o=%),static_cmdstruct),-DBTRFS_SEPARATED_STATIC_CMD_STRUCT) \
+		-c $(call sc_get,$(@:%.separated.o=%),cfile) -o $@
 
 %.static.o: %.c
 	@echo "    [CC]     $@"
@@ -563,6 +597,20 @@ endif
 #
 static: $(progs_static) libbtrfs.a libbtrfsutil.a
 
+separated: $(progs_separated)
+
+separated-fscaps: $(progs_separated_fscaps)
+
+.PHONY: separated separated-fscaps
+
+list-separated:
+	@echo "$(sc_cmds)" | tr ' ' '\n'
+
+list-fscaps:
+	@echo "$(foreach sc,$(sc_cmds_fscaps),$(sc)=$(call sc_get,$(sc),fscaps))" | tr ' ' '\n'
+
+.PHONY: list-separated list-fscaps
+
 libbtrfs/version.h: libbtrfs/version.h.in configure.ac
 	@echo "    [SH]     $@"
 	$(Q)bash ./config.status --silent $@
@@ -633,6 +681,11 @@ btrfs-%.static: btrfs-%.static.o $(static_objects) $(patsubst %.o,%.static.o,$(s
 		$(patsubst %.o, %.static.o, $($(subst -,_,$(subst .static,,$@)-objects))) \
 		$(static_libbtrfs_objects) $(STATIC_LDFLAGS) \
 		$($(subst -,_,$(subst .static,,$@)-libs)) $(STATIC_LIBS)
+
+btrfs-%.separated: btrfs-%.separated.o $(objects) $(cmds_objects) libbtrfsutil.a
+	@echo "    [LD]     $@"
+	$(Q)$(CC) -o $@ $@.o $(objects) libbtrfsutil.a \
+		$(LDFLAGS) $(LIBS)
 
 btrfs-%: btrfs-%.o $(objects) $(standalone_deps) libbtrfsutil.a
 	@echo "    [LD]     $@"
@@ -854,6 +907,7 @@ clean: $(CLEANDIRS)
 	      $(check_defs) \
 	      libbtrfs.a libbtrfsutil.a $(libs_shared) $(lib_links) \
 	      $(progs_static) \
+	      $(progs_separated) \
 	      libbtrfsutil/*.o libbtrfsutil/.deps/*.o.d
 	$(Q)$(RM) -fd -- .deps */.deps */*/.deps
 ifeq ($(PYTHON_BINDINGS),1)

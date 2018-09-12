@@ -6,6 +6,7 @@
 /libbtrfs/version.h
 /btrfs
 /btrfs.static
+/btrfs-*.separated
 /btrfs-map-logical
 /btrfs-map-logical.static
 /btrfs-fragments

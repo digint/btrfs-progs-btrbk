@@ -103,6 +103,7 @@ void usage_unknown_option(const struct cmd_struct *cmd, char **argv);
 
 __attribute__((noreturn))
 void usage(const struct cmd_struct *cmd, int error);
+void usage_separated(const char * const *usagestr, int error);
 void usage_command(const struct cmd_struct *cmd, bool full, bool err);
 void usage_command_group(const struct cmd_group *grp, bool all, bool err);
 void usage_command_group_short(const struct cmd_group *grp);
