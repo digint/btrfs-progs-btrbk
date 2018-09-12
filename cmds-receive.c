@@ -1249,6 +1249,7 @@ out:
 	return ret;
 }
 
+// @SEPARATED btrfs-receive fscaps: cap_sys_admin,cap_fowner,cap_chown,cap_mknod,cap_setfcap,cap_dac_override,cap_dac_read_search
 int cmd_receive(int argc, char **argv)
 {
 	char *tomnt = NULL;

@@ -121,4 +121,49 @@ int cmd_dump_super(int argc, char **argv);
 int cmd_debug_tree(int argc, char **argv);
 int cmd_rescue(int argc, char **argv);
 
+
+#ifdef BTRFS_SEPARATED_BUILD
+
+#ifndef BTRFS_SEPARATED_ENTRY
+#error please define BTRFS_SEPARATED_ENTRY (see Makefile: "btrfs-%.separated.o" target)
+#endif
+
+#ifdef BTRFS_SEPARATED_USAGE
+#include "help.h"
+#endif
+
+/* Note: handle_command_group is defined in btrfs.c and cannot be
+ * linked with separated subcommands because btrfs.o also contains a
+ * "main" symbol. As a workaround, we simply return 1 (error) for
+ * calls to handle_command_group() here (which is fine as this
+ * functionality is not required for BTRFS_SEPARATED_BUILD commands).
+ */
+#define handle_command_group(cmd_group,argc,argv) 1
+
+/* forward declaration of main entry point (non-static are already declared above) */
+#ifdef BTRFS_SEPARATED_STATIC_ENTRY
+static int BTRFS_SEPARATED_ENTRY(int argc, char **argv);
+static const char * const BTRFS_SEPARATED_USAGE [];
+#endif
+
+int main(int argc, char **argv)
+{
+	int i;
+	for (i = 1; i < argc; i++) {
+#ifdef BTRFS_SEPARATED_USAGE
+		if (strcmp(argv[i], "--help") == 0) {
+			usage(BTRFS_SEPARATED_USAGE);
+			return 0;
+		}
+#endif
+		if (strcmp(argv[i], "--version") == 0) {
+			printf("%s\n", PACKAGE_STRING);
+			return 0;
+		}
+	}
+	return BTRFS_SEPARATED_ENTRY (argc, argv);
+}
+
+#endif  /* BTRFS_SEPARATED_BUILD */
+
 #endif
