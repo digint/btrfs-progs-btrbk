@@ -2304,6 +2304,7 @@ static DEFINE_SIMPLE_COMMAND(qgroup_clear_stale, "clear-stale");
 static const char qgroup_cmd_group_info[] =
 "manage quota groups";
 
+#ifndef BTRFS_SEPARATED_BUILD
 static const struct cmd_group qgroup_cmd_group = {
 	qgroup_cmd_group_usage, qgroup_cmd_group_info, {
 		&cmd_struct_qgroup_assign,
@@ -2318,3 +2319,4 @@ static const struct cmd_group qgroup_cmd_group = {
 };
 
 DEFINE_GROUP_COMMAND_TOKEN(qgroup);
+#endif

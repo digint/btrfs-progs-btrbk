@@ -679,6 +679,7 @@ static DEFINE_SIMPLE_COMMAND(property_list, "list");
 static const char property_cmd_group_info[] =
 "modify properties of filesystem objects";
 
+#ifndef BTRFS_SEPARATED_BUILD
 static const struct cmd_group property_cmd_group = {
 	property_cmd_group_usage, property_cmd_group_info, {
 		&cmd_struct_property_get,
@@ -689,3 +690,4 @@ static const struct cmd_group property_cmd_group = {
 };
 
 DEFINE_GROUP_COMMAND_TOKEN(property);
+#endif

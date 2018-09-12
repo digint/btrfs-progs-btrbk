@@ -949,6 +949,7 @@ static DEFINE_COMMAND(balance_full, "--full-balance", cmd_balance_full,
 static const char balance_cmd_group_info[] =
 "balance data across devices, or change block groups using filters";
 
+#ifndef BTRFS_SEPARATED_BUILD
 static const struct cmd_group balance_cmd_group = {
 	balance_cmd_group_usage, balance_cmd_group_info, {
 		&cmd_struct_balance_start,
@@ -962,3 +963,4 @@ static const struct cmd_group balance_cmd_group = {
 };
 
 DEFINE_GROUP_COMMAND_TOKEN(balance);
+#endif

@@ -1781,6 +1781,8 @@ static int cmd_filesystem_label(const struct cmd_struct *cmd,
 }
 static DEFINE_SIMPLE_COMMAND(filesystem_label, "label");
 
+#ifndef BTRFS_SEPARATED_BUILD
+
 static const char * const cmd_filesystem_balance_usage[] = {
 	"btrfs filesystem balance [args...] (alias of \"btrfs balance\")",
 	"Please see \"btrfs balance --help\" for more information.",
@@ -2137,3 +2139,4 @@ static const struct cmd_group filesystem_cmd_group = {
 };
 
 DEFINE_GROUP_COMMAND_TOKEN(filesystem);
+#endif

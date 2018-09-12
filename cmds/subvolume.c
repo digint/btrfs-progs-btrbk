@@ -1828,6 +1828,7 @@ static DEFINE_SIMPLE_COMMAND(subvolume_sync, "sync");
 static const char subvolume_cmd_group_info[] =
 "manage subvolumes: create, delete, list, etc";
 
+#ifndef BTRFS_SEPARATED_BUILD
 static const struct cmd_group subvolume_cmd_group = {
 	subvolume_cmd_group_usage, subvolume_cmd_group_info, {
 		&cmd_struct_subvolume_create,
@@ -1844,3 +1845,4 @@ static const struct cmd_group subvolume_cmd_group = {
 };
 
 DEFINE_GROUP_COMMAND_TOKEN(subvolume);
+#endif

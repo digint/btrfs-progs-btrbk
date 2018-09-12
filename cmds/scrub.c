@@ -2219,6 +2219,7 @@ static DEFINE_SIMPLE_COMMAND(scrub_limit, "limit");
 static const char scrub_cmd_group_info[] =
 "verify checksums of data and metadata";
 
+#ifndef BTRFS_SEPARATED_BUILD
 static const struct cmd_group scrub_cmd_group = {
 	scrub_cmd_group_usage, scrub_cmd_group_info, {
 		&cmd_struct_scrub_start,
@@ -2231,3 +2232,4 @@ static const struct cmd_group scrub_cmd_group = {
 };
 
 DEFINE_GROUP_COMMAND_TOKEN(scrub);
+#endif
