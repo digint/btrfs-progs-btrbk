@@ -1076,6 +1076,7 @@ static const char * const cmd_filesystem_usage_usage[] = {
 	NULL
 };
 
+// @SEPARATED btrfs-filesystem-usage fscaps: cap_sys_admin
 static int cmd_filesystem_usage(const struct cmd_struct *cmd,
 				int argc, char **argv)
 {
