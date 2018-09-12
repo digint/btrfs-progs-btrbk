@@ -920,6 +920,7 @@ static DEFINE_COMMAND(device_replace, "replace", cmd_device_replace,
 static const char device_cmd_group_info[] =
 "manage and query devices in the filesystem";
 
+#ifndef BTRFS_SEPARATED_BUILD
 static const struct cmd_group device_cmd_group = {
 	device_cmd_group_usage, device_cmd_group_info, {
 		&cmd_struct_device_add,
@@ -935,3 +936,4 @@ static const struct cmd_group device_cmd_group = {
 };
 
 DEFINE_GROUP_COMMAND_TOKEN(device);
+#endif

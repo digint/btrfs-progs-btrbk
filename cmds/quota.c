@@ -220,6 +220,7 @@ static DEFINE_SIMPLE_COMMAND(quota_rescan, "rescan");
 static const char quota_cmd_group_info[] =
 "manage filesystem quota settings";
 
+#ifndef BTRFS_SEPARATED_BUILD
 static const struct cmd_group quota_cmd_group = {
 	quota_cmd_group_usage, quota_cmd_group_info, {
 		&cmd_struct_quota_enable,
@@ -230,3 +231,4 @@ static const struct cmd_group quota_cmd_group = {
 };
 
 DEFINE_GROUP_COMMAND_TOKEN(quota);
+#endif
