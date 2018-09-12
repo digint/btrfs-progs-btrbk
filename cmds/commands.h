@@ -73,6 +73,10 @@ struct cmd_struct {
 #endif
 
 /* Define a command with all members specified */
+#ifdef BTRFS_SEPARATED_BUILD
+#define DEFINE_COMMAND(name, _token, _fn, _usagestr, _group, _flags)    \
+	const int dummy_btrfs_separated_build_ ##name
+#else
 #define DEFINE_COMMAND(name, _token, _fn, _usagestr, _group, _flags)	\
 	const struct cmd_struct __CMD_NAME(name) =			\
 		{							\
@@ -82,6 +86,7 @@ struct cmd_struct {
 			.next = (_group),				\
 			.flags = CMD_FORMAT_TEXT | (_flags),		\
 		}
+#endif
 
 /*
  * Define a command for the common case - just a name and string.
@@ -176,23 +181,20 @@ DECLARE_COMMAND(rescue);
 #include "common/utils.h"
 #include "kernel-shared/volumes.h"
 
-/* Note: handle_command_group is defined in btrfs.c and cannot be
- * linked with separated subcommands because btrfs.o also contains a
- * "main" symbol. As a workaround, we simply return 1 (error) for
- * calls to handle_command_group() here (which is fine as this
- * functionality is not required for BTRFS_SEPARATED_BUILD commands).
- */
-#define handle_command_group(cmd_group,argc,argv) 1
 
 /* forward declaration of main entry point (non-static are already declared above) */
 static int BTRFS_SEPARATED_ENTRY(const struct cmd_struct *cmd, int argc, char **argv);
 static const char * const BTRFS_SEPARATED_USAGE [];
 
-#ifdef BTRFS_SEPARATED_STATIC_CMD_STRUCT
-static const struct cmd_struct BTRFS_SEPARATED_CMD_STRUCT;
-#else
-const struct cmd_struct BTRFS_SEPARATED_CMD_STRUCT;
-#endif
+
+const struct cmd_struct btrfs_separated_cmd_struct =
+	{
+		.token = NULL,
+		.fn = BTRFS_SEPARATED_ENTRY,
+		.usagestr = BTRFS_SEPARATED_USAGE,
+		.next = NULL,
+		.flags = 0,
+	};
 
 int main(int argc, char **argv)
 {
@@ -204,7 +206,7 @@ int main(int argc, char **argv)
 
 	for (i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "--help") == 0) {
-			usage_command(& BTRFS_SEPARATED_CMD_STRUCT, true, false);
+			usage_command(& btrfs_separated_cmd_struct, true, false);
 			exit(0);
 		}
 		if (strcmp(argv[i], "--version") == 0) {
@@ -213,7 +215,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	ret = cmd_execute(& BTRFS_SEPARATED_CMD_STRUCT, argc, argv);
+	ret = cmd_execute(& btrfs_separated_cmd_struct, argc, argv);
 	btrfs_close_all_devices();
 	exit(ret);
 }
