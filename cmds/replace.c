@@ -594,6 +594,7 @@ static DEFINE_SIMPLE_COMMAND(replace_cancel, "cancel");
 static const char replace_cmd_group_info[] =
 "replace a device in the filesystem";
 
+#ifndef BTRFS_SEPARATED_BUILD
 static const struct cmd_group replace_cmd_group = {
 	replace_cmd_group_usage, replace_cmd_group_info, {
 		&cmd_struct_replace_start,
@@ -604,3 +605,4 @@ static const struct cmd_group replace_cmd_group = {
 };
 
 DEFINE_GROUP_COMMAND_TOKEN(replace);
+#endif
