@@ -384,6 +384,15 @@ sc_cmds_all := $(sort $(foreach val,$(sc_map),$(firstword $(subst @, ,$(val)))))
 sc_cmds := $(filter-out $(sc_exclude),$(sc_cmds_all))
 sc_cmds_fscaps := $(sort $(subst @fscaps,,$(filter %@fscaps,$(subst :, ,$(sc_map)))))
 
+# Additional cmds_objects required for separated binaries
+btrfs_device_add_objects = mkfs/common.o
+btrfs_device_usage_objects = cmds/filesystem-usage.o
+btrfs_filesystem_show_objects = cmds/filesystem-usage.o
+btrfs_replace_start_objects = mkfs/common.o
+btrfs_rescue_super_recover_objects = super-recover.o
+btrfs_rescue_chunk_recover_objects = check/mode-lowmem.o check/mode-common.o check/main.o chunk-recover.o
+btrfs_restore_objects = $(LIBS_COMP)
+
 # Using suffix allows strict distinction in targets below (btrfs-%.separated[.o])
 progs_separated = $(addsuffix .separated,$(sc_cmds))
 progs_separated_fscaps = $(addsuffix .separated,$(sc_cmds_fscaps))
@@ -685,6 +694,7 @@ btrfs-%.static: btrfs-%.static.o $(static_objects) $(patsubst %.o,%.static.o,$(s
 btrfs-%.separated: btrfs-%.separated.o $(objects) $(cmds_objects) libbtrfsutil.a
 	@echo "    [LD]     $@"
 	$(Q)$(CC) -o $@ $@.o $(objects) libbtrfsutil.a \
+		$($(subst -,_,$(@:%.separated=%)-objects)) \
 		$(LDFLAGS) $(LIBS)
 
 btrfs-%: btrfs-%.o $(objects) $(standalone_deps) libbtrfsutil.a
