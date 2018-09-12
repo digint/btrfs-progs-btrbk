@@ -489,6 +489,7 @@ static void free_send_info(struct btrfs_send *sctx)
 	subvol_uuid_search_finit(&sctx->sus);
 }
 
+// @SEPARATED btrfs-send fscaps: cap_sys_admin,cap_fowner,cap_dac_read_search
 int cmd_send(int argc, char **argv)
 {
 	char *subvol = NULL;
