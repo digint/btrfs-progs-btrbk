@@ -65,8 +65,12 @@ struct cmd_struct {
  * cmd_struct_<name>.
  */
 #define __CMD_NAME(name)	cmd_struct_ ##name
+#ifdef BTRFS_SEPARATED_BUILD
+#define DECLARE_COMMAND(name)
+#else
 #define DECLARE_COMMAND(name)						\
 	extern const struct cmd_struct __CMD_NAME(name)
+#endif
 
 /* Define a command with all members specified */
 #define DEFINE_COMMAND(name, _token, _fn, _usagestr, _group, _flags)	\
@@ -101,9 +105,13 @@ struct cmd_struct {
  * It's assumed that the callback is called cmd_<name> and the
  * struct cmd_group is called <name>_cmd_group.
  */
+#ifdef BTRFS_SEPARATED_BUILD
+#define DEFINE_GROUP_COMMAND(name, token)
+#else
 #define DEFINE_GROUP_COMMAND(name, token)				\
 	DEFINE_COMMAND(name, token, handle_command_group,		\
 		       NULL, &(name ## _cmd_group), 0)
+#endif
 
 /*
  * Define a command group callback when the name and the string are
@@ -125,7 +133,9 @@ static inline int cmd_execute(const struct cmd_struct *cmd,
 	return cmd->fn(cmd, argc, argv);
 }
 
+#ifndef BTRFS_SEPARATED_BUILD
 int handle_command_group(const struct cmd_struct *cmd, int argc, char **argv);
+#endif
 
 extern const char * const generic_cmd_help_usage[];
 
@@ -150,5 +160,60 @@ DECLARE_COMMAND(qgroup);
 DECLARE_COMMAND(replace);
 DECLARE_COMMAND(restore);
 DECLARE_COMMAND(rescue);
+
+
+#ifdef BTRFS_SEPARATED_BUILD
+
+#ifndef BTRFS_SEPARATED_ENTRY
+#error please define BTRFS_SEPARATED_ENTRY (see Makefile: "btrfs-%.separated.o" target)
+#endif
+
+#include "common/help.h"
+#include "common/utils.h"
+#include "kernel-shared/volumes.h"
+
+/* Note: handle_command_group is defined in btrfs.c and cannot be
+ * linked with separated subcommands because btrfs.o also contains a
+ * "main" symbol. As a workaround, we simply return 1 (error) for
+ * calls to handle_command_group() here (which is fine as this
+ * functionality is not required for BTRFS_SEPARATED_BUILD commands).
+ */
+#define handle_command_group(cmd_group,argc,argv) 1
+
+/* forward declaration of main entry point (non-static are already declared above) */
+static int BTRFS_SEPARATED_ENTRY(const struct cmd_struct *cmd, int argc, char **argv);
+static const char * const BTRFS_SEPARATED_USAGE [];
+
+#ifdef BTRFS_SEPARATED_STATIC_CMD_STRUCT
+static const struct cmd_struct BTRFS_SEPARATED_CMD_STRUCT;
+#else
+const struct cmd_struct BTRFS_SEPARATED_CMD_STRUCT;
+#endif
+
+int main(int argc, char **argv)
+{
+	int ret;
+	int i;
+
+	set_argv0(argv);
+	btrfs_config_init();
+
+	for (i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "--help") == 0) {
+			usage_command(& BTRFS_SEPARATED_CMD_STRUCT, true, false);
+			exit(0);
+		}
+		if (strcmp(argv[i], "--version") == 0) {
+			printf("%s\n", PACKAGE_STRING);
+			exit(0);
+		}
+	}
+
+	ret = cmd_execute(& BTRFS_SEPARATED_CMD_STRUCT, argc, argv);
+	btrfs_close_all_devices();
+	exit(ret);
+}
+
+#endif  /* BTRFS_SEPARATED_BUILD */
 
 #endif

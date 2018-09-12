@@ -331,6 +331,13 @@ void usage(const struct cmd_struct *cmd)
 	exit(1);
 }
 
+__attribute__((noreturn))
+void usage_separated(const char * const *usagestr)
+{
+	usage_command_usagestr(usagestr, NULL, 0, true, true);
+	exit(1);
+}
+
 static void usage_command_group_internal(const struct cmd_group *grp, bool full,
 					 FILE *outf)
 {
