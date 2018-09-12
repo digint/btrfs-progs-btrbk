@@ -132,14 +132,6 @@ int cmd_rescue(int argc, char **argv);
 #include "help.h"
 #endif
 
-/* Note: handle_command_group is defined in btrfs.c and cannot be
- * linked with separated subcommands because btrfs.o also contains a
- * "main" symbol. As a workaround, we simply return 1 (error) for
- * calls to handle_command_group() here (which is fine as this
- * functionality is not required for BTRFS_SEPARATED_BUILD commands).
- */
-#define handle_command_group(cmd_group,argc,argv) 1
-
 /* forward declaration of main entry point (non-static are already declared above) */
 #ifdef BTRFS_SEPARATED_STATIC_ENTRY
 static int BTRFS_SEPARATED_ENTRY(int argc, char **argv);

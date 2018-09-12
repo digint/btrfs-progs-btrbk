@@ -639,6 +639,7 @@ out:
 static const char inspect_cmd_group_info[] =
 "query various internal information";
 
+#ifndef BTRFS_SEPARATED_BUILD
 const struct cmd_group inspect_cmd_group = {
 	inspect_cmd_group_usage, inspect_cmd_group_info, {
 		{ "inode-resolve", cmd_inspect_inode_resolve,
@@ -665,3 +666,4 @@ int cmd_inspect(int argc, char **argv)
 {
 	return handle_command_group(&inspect_cmd_group, argc, argv);
 }
+#endif

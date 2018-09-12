@@ -256,6 +256,7 @@ out:
 static const char rescue_cmd_group_info[] =
 "toolbox for specific rescue operations";
 
+#ifndef BTRFS_SEPARATED_BUILD
 const struct cmd_group rescue_cmd_group = {
 	rescue_cmd_group_usage, rescue_cmd_group_info, {
 		{ "chunk-recover", cmd_rescue_chunk_recover,
@@ -273,3 +274,4 @@ int cmd_rescue(int argc, char **argv)
 {
 	return handle_command_group(&rescue_cmd_group, argc, argv);
 }
+#endif
