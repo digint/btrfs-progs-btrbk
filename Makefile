@@ -482,7 +482,7 @@ endif
 # BTRFS_SEPARATED_BUILD), using "cfile" from sc_map (cmd/xxx.c) as gcc infile.
 btrfs-%.separated.o: $(call sc_get,$(@:%.separated.o=%),cfile)
 	@echo "    [CC]     $@"
-	$(Q)$(CC) $(CFLAGS) \
+	$(Q)$(CC) $(CFLAGS) -Wno-unused-function -Wno-unused-const-variable \
 		-DBTRFS_SEPARATED_BUILD \
 		-DBTRFS_SEPARATED_ENTRY=$(call sc_get,$(@:%.separated.o=%),entry) \
 		-DBTRFS_SEPARATED_USAGE=$(call sc_get,$(@:%.separated.o=%),entry)_usage \

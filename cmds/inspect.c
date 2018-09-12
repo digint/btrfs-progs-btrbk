@@ -1526,6 +1526,7 @@ static DEFINE_SIMPLE_COMMAND(inspect_map_swapfile, "map-swapfile");
 static const char inspect_cmd_group_info[] =
 "query various internal information";
 
+#ifndef BTRFS_SEPARATED_BUILD
 static const struct cmd_group inspect_cmd_group = {
 	inspect_cmd_group_usage, inspect_cmd_group_info, {
 		&cmd_struct_inspect_inode_resolve,
@@ -1545,3 +1546,4 @@ static const struct cmd_group inspect_cmd_group = {
 };
 
 DEFINE_GROUP_COMMAND(inspect, "inspect-internal");
+#endif

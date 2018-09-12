@@ -406,6 +406,7 @@ static DEFINE_SIMPLE_COMMAND(rescue_clear_uuid_tree, "clear-uuid-tree");
 static const char rescue_cmd_group_info[] =
 "toolbox for specific rescue operations";
 
+#ifndef BTRFS_SEPARATED_BUILD
 static const struct cmd_group rescue_cmd_group = {
 	rescue_cmd_group_usage, rescue_cmd_group_info, {
 		&cmd_struct_rescue_chunk_recover,
@@ -419,3 +420,4 @@ static const struct cmd_group rescue_cmd_group = {
 };
 
 DEFINE_GROUP_COMMAND_TOKEN(rescue);
+#endif
