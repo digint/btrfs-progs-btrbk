@@ -94,12 +94,13 @@ Development
 
 If you would like to contribute or have found bugs:
 
-  * Visit [digint/btrfs-progs-btrbk on GitHub] and use the [issues
-    tracker] there.
-* Talk to us on Freenode in `#btrbk`.
+  * Visit the [btrfs-progs-btrbk project page on GitHub] and use the
+    [issues tracker] there.
+  * Talk to us on [Libera.Chat] in `#btrbk`.
 
-  [digint/btrfs-progs-btrbk on GitHub]: https://github.com/digint/btrfs-progs-btrbk
+  [btrfs-progs-btrbk project page on GitHub]: https://github.com/digint/btrfs-progs-btrbk
   [issues tracker]: https://github.com/digint/btrfs-progs-btrbk/issues
+  [Libera.Chat]: https://libera.chat
 
 
 References
