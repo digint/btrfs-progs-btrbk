@@ -247,11 +247,16 @@ static int cmd_subvolume_create(const struct cmd_struct *cmd, int argc, char **a
 			{ NULL, 0, NULL, 0 }
 		};
 
+#ifndef BTRFS_SEPARATED_BUILD
 		c = getopt_long(argc, argv, "i:p", long_options, NULL);
+#else
+		c = getopt_long(argc, argv, "p", long_options, NULL);
+#endif
 		if (c < 0)
 			break;
 
 		switch (c) {
+#ifndef BTRFS_SEPARATED_BUILD
 		case 'i':
 			ret = qgroup_inherit_add_group(&inherit, optarg);
 			if (ret) {
@@ -259,6 +264,7 @@ static int cmd_subvolume_create(const struct cmd_struct *cmd, int argc, char **a
 				goto out;
 			}
 			break;
+#endif
 		case 'p':
 			create_parents = true;
 			break;
@@ -675,11 +681,16 @@ static int cmd_subvolume_snapshot(const struct cmd_struct *cmd, int argc, char *
 
 	optind = 0;
 	while (1) {
+#ifndef BTRFS_SEPARATED_BUILD
 		int c = getopt(argc, argv, "i:r");
+#else
+		int c = getopt(argc, argv, "r");
+#endif
 		if (c < 0)
 			break;
 
 		switch (c) {
+#ifndef BTRFS_SEPARATED_BUILD
 		case 'i':
 			res = qgroup_inherit_add_group(&inherit, optarg);
 			if (res) {
@@ -687,6 +698,7 @@ static int cmd_subvolume_snapshot(const struct cmd_struct *cmd, int argc, char *
 				goto out;
 			}
 			break;
+#endif
 		case 'r':
 			flags |= BTRFS_UTIL_CREATE_SNAPSHOT_READ_ONLY;
 			break;
@@ -1525,11 +1537,13 @@ static int cmd_subvolume_show(const struct cmd_struct *cmd, int argc, char **arg
 	char *subvol_path = NULL;
 	const char *subvol_name = NULL;
 	enum btrfs_util_error err;
+	struct format_ctx fctx;
+#ifndef BTRFS_SEPARATED_BUILD
 	struct btrfs_qgroup_stats stats;
 	unsigned int unit_mode;
-	struct format_ctx fctx;
 
 	unit_mode = get_unit_mode_from_arg(&argc, argv, 1);
+#endif
 
 	optind = 0;
 	while (1) {
@@ -1684,6 +1698,7 @@ static int cmd_subvolume_show(const struct cmd_struct *cmd, int argc, char **arg
 
 	btrfs_util_subvolume_iter_destroy(iter);
 
+#ifndef BTRFS_SEPARATED_BUILD
 	ret = btrfs_qgroup_query(fd, subvol.id, &stats);
 	if (ret == -ENOTTY) {
 		/* Quota information not available, not fatal */
@@ -1702,6 +1717,7 @@ static int cmd_subvolume_show(const struct cmd_struct *cmd, int argc, char **arg
 		print_subvolume_show_quota_json(&fctx, &subvol, &stats);
 	else
 		print_subvolume_show_quota_text(&subvol, &stats, unit_mode);
+#endif
 
 out2:
 	if (bconf.output_format == CMD_FORMAT_JSON) {
