@@ -108,11 +108,16 @@ static int cmd_subvol_create(const struct cmd_struct *cmd,
 
 	optind = 0;
 	while (1) {
+#ifndef BTRFS_SEPARATED_BUILD
 		int c = getopt(argc, argv, "c:i:");
+#else
+		int c = getopt(argc, argv, "");
+#endif
 		if (c < 0)
 			break;
 
 		switch (c) {
+#ifndef BTRFS_SEPARATED_BUILD
 		case 'c':
 			res = btrfs_qgroup_inherit_add_copy(&inherit, optarg, 0);
 			if (res) {
@@ -127,6 +132,7 @@ static int cmd_subvol_create(const struct cmd_struct *cmd,
 				goto out;
 			}
 			break;
+#endif
 		default:
 			usage_unknown_option(cmd, argv);
 		}
@@ -543,11 +549,16 @@ static int cmd_subvol_snapshot(const struct cmd_struct *cmd,
 	memset(&args, 0, sizeof(args));
 	optind = 0;
 	while (1) {
+#ifndef BTRFS_SEPARATED_BUILD
 		int c = getopt(argc, argv, "c:i:r");
+#else
+		int c = getopt(argc, argv, "r");
+#endif
 		if (c < 0)
 			break;
 
 		switch (c) {
+#ifndef BTRFS_SEPARATED_BUILD
 		case 'c':
 			res = btrfs_qgroup_inherit_add_copy(&inherit, optarg, 0);
 			if (res) {
@@ -555,6 +566,8 @@ static int cmd_subvol_snapshot(const struct cmd_struct *cmd,
 				goto out;
 			}
 			break;
+#endif
+#ifndef BTRFS_SEPARATED_BUILD
 		case 'i':
 			res = btrfs_qgroup_inherit_add_group(&inherit, optarg);
 			if (res) {
@@ -562,9 +575,11 @@ static int cmd_subvol_snapshot(const struct cmd_struct *cmd,
 				goto out;
 			}
 			break;
+#endif
 		case 'r':
 			readonly = 1;
 			break;
+#ifndef BTRFS_SEPARATED_BUILD
 		case 'x':
 			res = btrfs_qgroup_inherit_add_copy(&inherit, optarg, 1);
 			if (res) {
@@ -572,6 +587,7 @@ static int cmd_subvol_snapshot(const struct cmd_struct *cmd,
 				goto out;
 			}
 			break;
+#endif
 		default:
 			usage_unknown_option(cmd, argv);
 		}
@@ -1269,10 +1285,12 @@ static int cmd_subvol_show(const struct cmd_struct *cmd, int argc, char **argv)
 	struct btrfs_util_subvolume_info subvol;
 	char *subvol_path = NULL;
 	enum btrfs_util_error err;
+#ifndef BTRFS_SEPARATED_BUILD
 	struct btrfs_qgroup_stats stats;
 	unsigned int unit_mode;
 
 	unit_mode = get_unit_mode_from_arg(&argc, argv, 1);
+#endif
 
 	optind = 0;
 	while (1) {
@@ -1473,6 +1491,7 @@ static int cmd_subvol_show(const struct cmd_struct *cmd, int argc, char **argv)
 	}
 	btrfs_util_destroy_subvolume_iterator(iter);
 
+#ifndef BTRFS_SEPARATED_BUILD
 	ret = btrfs_qgroup_query(fd, subvol.id, &stats);
 	if (ret == -ENOTTY) {
 		/* Quotas not enabled */
@@ -1504,6 +1523,7 @@ static int cmd_subvol_show(const struct cmd_struct *cmd, int argc, char **argv)
 			pretty_size_mode(stats.info.referenced, unit_mode));
 	printf("\t  Usage exclusive:\t%s\n",
 			pretty_size_mode(stats.info.exclusive, unit_mode));
+#endif
 
 out:
 	free(subvol_path);
