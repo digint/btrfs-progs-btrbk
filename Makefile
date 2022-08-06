@@ -361,7 +361,8 @@ sc_map += $(shell sed -rn 's/^.*@SEPARATED\s+(btrfs-[a-z-]+)\s+([a-z_]+):\s*(.*)
 sc_get = $(word 2,$(subst :, ,$(filter $(1)@$(2):%,$(sc_map))))
 
 # Exclude buggy commands
-sc_exclude = btrfs-property-get btrfs-property-set btrfs-property-list
+#sc_exclude = btrfs-property-get btrfs-property-set btrfs-property-list
+sc_exclude =
 sc_cmds_all := $(sort $(foreach val,$(sc_map),$(firstword $(subst @, ,$(val)))))
 sc_cmds := $(filter-out $(sc_exclude),$(sc_cmds_all))
 sc_cmds_fscaps := $(sort $(subst @fscaps,,$(filter %@fscaps,$(subst :, ,$(sc_map)))))
