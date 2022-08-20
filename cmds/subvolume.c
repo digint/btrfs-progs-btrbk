@@ -1523,6 +1523,8 @@ static int cmd_subvol_show(const struct cmd_struct *cmd, int argc, char **argv)
 			pretty_size_mode(stats.info.referenced, unit_mode));
 	printf("\t  Usage exclusive:\t%s\n",
 			pretty_size_mode(stats.info.exclusive, unit_mode));
+#else
+        ret = 0;
 #endif
 
 out:
