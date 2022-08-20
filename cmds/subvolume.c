@@ -1717,6 +1717,8 @@ static int cmd_subvolume_show(const struct cmd_struct *cmd, int argc, char **arg
 		print_subvolume_show_quota_json(&fctx, &subvol, &stats);
 	else
 		print_subvolume_show_quota_text(&subvol, &stats, unit_mode);
+#else
+        ret = 0;
 #endif
 
 out2:
