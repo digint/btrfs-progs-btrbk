@@ -1516,6 +1516,8 @@ static int cmd_subvolume_show(const struct cmd_struct *cmd, int argc, char **arg
 			pretty_size_mode(stats.info.referenced, unit_mode));
 	pr_verbose(LOG_DEFAULT, "\t  Usage exclusive:\t%s\n",
 			pretty_size_mode(stats.info.exclusive, unit_mode));
+#else
+        ret = 0;
 #endif
 
 out:
