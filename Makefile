@@ -379,6 +379,7 @@ btrfs_replace_start_objects = mkfs/common.o
 btrfs_rescue_super_recover_objects = super-recover.o
 btrfs_rescue_chunk_recover_objects = check/mode-lowmem.o check/mode-common.o check/main.o chunk-recover.o
 btrfs_restore_objects = $(LIBS_COMP)
+btrfs_receive_objects = $(LIBS_COMP)
 
 # Using suffix allows strict distinction in targets below (btrfs-%.separated[.o])
 progs_separated = $(addsuffix .separated,$(sc_cmds))
