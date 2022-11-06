@@ -900,6 +900,7 @@ static int cmd_device_usage(const struct cmd_struct *cmd, int argc, char **argv)
 }
 static DEFINE_SIMPLE_COMMAND(device_usage, "usage");
 
+#ifndef BTRFS_SEPARATED_BUILD
 static const char * const cmd_device_replace_usage[] = {
 	"btrfs device replace <command> [...]\n"
 	"\tReplace a device (alias of \"btrfs replace\")",
@@ -920,7 +921,6 @@ static DEFINE_COMMAND(device_replace, "replace", cmd_device_replace,
 static const char device_cmd_group_info[] =
 "manage and query devices in the filesystem";
 
-#ifndef BTRFS_SEPARATED_BUILD
 static const struct cmd_group device_cmd_group = {
 	device_cmd_group_usage, device_cmd_group_info, {
 		&cmd_struct_device_add,
