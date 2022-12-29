@@ -1804,6 +1804,8 @@ static int cmd_filesystem_balance(const struct cmd_struct *unused,
 static DEFINE_COMMAND(filesystem_balance, "balance", cmd_filesystem_balance,
 		      cmd_filesystem_balance_usage, NULL, CMD_HIDDEN);
 
+#endif
+
 static const char * const cmd_filesystem_mkswapfile_usage[] = {
 	"btrfs filesystem mkswapfile <file>",
         "Create a new file that's suitable and formatted as a swapfile.",
@@ -2117,6 +2119,8 @@ out:
 	return 0;
 }
 static DEFINE_SIMPLE_COMMAND(filesystem_commit_stats, "commit-stats");
+
+#ifndef BTRFS_SEPARATED_BUILD
 
 static const char filesystem_cmd_group_info[] =
 "overall filesystem tasks and information";
