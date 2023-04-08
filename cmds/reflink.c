@@ -195,6 +195,7 @@ static DEFINE_SIMPLE_COMMAND(reflink_clone, "clone");
 static const char reflink_cmd_group_info[] =
 "reflink, shallow file copies: clone";
 
+#ifndef BTRFS_SEPARATED_BUILD
 static const struct cmd_group reflink_cmd_group = {
 	reflink_cmd_group_usage, reflink_cmd_group_info, {
 		&cmd_struct_reflink_clone,
@@ -203,3 +204,4 @@ static const struct cmd_group reflink_cmd_group = {
 };
 
 DEFINE_GROUP_COMMAND_TOKEN(reflink);
+#endif
