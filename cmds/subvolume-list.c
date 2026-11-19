@@ -1360,8 +1360,14 @@ static void print_all_subvol_info(struct rb_root *sorted_tree,
 	if (layout == BTRFS_LIST_LAYOUT_TABLE) {
 		print_all_subvol_info_tab_head();
 	} else if (layout == BTRFS_LIST_LAYOUT_JSON) {
+#ifndef BTRFS_SEPARATED_BUILD
+// hotfix disabled: undefined reference to btrfs_subvolume_rowspec
 		fmt_start(&fctx, btrfs_subvolume_rowspec, 1, 0);
 		fmt_print_start_group(&fctx, "subvolume-list", JSON_TYPE_ARRAY);
+#else
+		error("separated build does not support json layout");
+		exit(1);
+#endif
 	}
 
 	n = rb_first(sorted_tree);
