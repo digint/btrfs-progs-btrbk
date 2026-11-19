@@ -424,7 +424,7 @@ endif
 # Parse "static int cmd_xxx_yyy(int argc, char **argv)" lines in cfiles, and
 # create whitespace separated map of form: "btrfs-xxx-yyy@key:value".
 sc_cfiles := $(wildcard cmds/*.c)
-sc_map := $(foreach file,$(sc_cfiles),$(shell sed -rn 's!^(static )?DEFINE_SIMPLE_COMMAND\(([a-z_]+), \"([a-z_]+)\"\).*!btrfs_\2@cfile:$(file) btrfs_\2@cmdstruct:cmd_struct_\2 btrfs_\2@entry:cmd_\2 btrfs_\2@token:\3 btrfs_\2@static_cmdstruct:\1!p' $(file)))
+sc_map := $(foreach file,$(sc_cfiles),$(shell sed -rn 's!^(static )?(DEFINE_SIMPLE_COMMAND|DEFINE_COMMAND_WITH_FLAGS)\(([a-z_]+), \"([a-z_]+)\"(, [A-Z_]+)?\).*!btrfs_\3@cfile:$(file) btrfs_\3@cmdstruct:cmd_struct_\3 btrfs_\3@entry:cmd_\3 btrfs_\3@token:\4 btrfs_\3@static_cmdstruct:\1!p' $(file)))
 sc_map := $(foreach val,$(sc_map),$(subst _,-,$(firstword $(subst @, ,$(val))))@$(word 2,$(subst @, ,$(val))))
 sc_map := $(subst btrfs-subvol-,btrfs-subvolume-,$(sc_map))
 
